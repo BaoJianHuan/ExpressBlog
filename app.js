@@ -1,27 +1,34 @@
-const path = require('path')
 const express = require('express')
-const bodyParser = require('body-parser')
-const router=require('./router')
+const logger = require('morgan')
 
 const app = express()
+//Middlewares
+app.use(logger('dev'))
 
-const port = 3000
-
-app.use('/public', express.static(path.join(__dirname, 'public')))
-app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')))
-app.engine('html',require('express-art-template'))
-app.set('views',path.join(__dirname,'views'))
-
-app.use(bodyParser.urlencoded({extended:false}))
-app.use(bodyParser.json())
-app.use(router)
-
-app.get('**',(req, res)=>{
-    res.render('404.html')
+app.get('/',(req,res,next)=>{
+    res.status(200).json({
+        message:'Your requested index page'
+    })
 })
 
-app.use((err,req,res,next)=>{
-    console.log(err.stack)
-    res.status(500).send('Something broke!')
+app.use((req, res, next) => {
+    const err = new Error('Not Found')
+    err.status = 404
+    next(err)
 })
-app.listen(port, () => console.log(`My blog app listening on port ${port}!`))
+
+app.use((err, req, res, next) => {
+    const error = app.get('env') === 'development' ? err : {}
+    const status = err.status || 500
+
+    res.status(status).json({
+        error: {
+            message: error.message
+        }
+    })
+    console.error(err)
+})
+
+const port = app.get('port') || 3000
+
+app.listen(port, () => console.log(`Server is listening on port ${port}`))

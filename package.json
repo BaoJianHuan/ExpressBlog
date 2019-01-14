@@ -17,6 +17,9 @@
   },
   "homepage": "https://github.com/BaoJianHuan/ExpressBlog#readme",
   "dependencies": {
-    "express": "^4.16.4"
+    "art-template": "^4.13.2",
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4",
+    "express-art-template": "^1.0.1"
   }
 }
